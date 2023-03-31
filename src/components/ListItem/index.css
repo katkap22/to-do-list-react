@@ -1,0 +1,35 @@
+.item {
+    display:flex;
+    justify-content: flex-start;
+    width: 405px;
+    height: 31px;
+    margin: 5px 0;
+    
+}
+
+.item_text {  
+    font-size: 20px;
+     background-color: aqua;
+     border: 2px solid gray;
+     width: 400px;
+     height: auto;
+}
+
+.item_btn {
+    min-width: 31px;
+    height: 31px;
+    border-radius: 50px;
+    background-color: transparent;
+    border: none;
+    color: #000;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 25px;
+    padding: 3px;
+}
+
+.item_btn:hover {
+    background: #333;
+    color: #fff;
+    transition-duration: 1s;
+}
