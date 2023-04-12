@@ -5,13 +5,12 @@ function Button({ text, onClick, customClass }) {
   return (
     <button
       className={`btn ${customClass ? customClass : ""}`}
-      onClick={onClick}
+      onClick={onClick} 
     >
       {text}
     </button>
   );
 }
 
-
-
 export default Button;
+  

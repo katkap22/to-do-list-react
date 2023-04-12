@@ -7,3 +7,8 @@
 .item_btn {
     background-color: aqua;
 }
+
+.btn_filter {
+    background-color:blueviolet;
+    color: white;
+}

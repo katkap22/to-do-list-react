@@ -3,89 +3,94 @@ import './App.css';
 import Title from "../Title";
 import Input from '../Input';
 import Button from '../Button';
-import ListItem from '../ListItem';
-
-function RenderChild({children}){
-  console.log(children)
-
-  if (React.Children.count(children) > 1) {
-    return (
-      <div>
-        {React.Children.toArray(children).map((item) => (
-          <p key={children.id}>{item}</p>
-        ))}
-      </div>
-    ); 
-    
-  } else {
-  return React.Children.only(children);
-  }
-  // return <div>{React.Children.toArray(this.props.children)}</div>;
-}
+import List from '../List';
+import Filters from '../Filters';
+import { v1 } from 'uuid';
 
 class App extends React.Component {
-  constructor(props){
-    super(props)
+  constructor(props) {
+    super(props);
     this.state = {
-      inputValue: '',
-      toDoList: [],
-    }
+      inputValue: "",
+      tasks: [], //массив объектов (id, title, isDone)
+      filter: "all",
+    };
   }
 
   onChangeInput = (event) => {
-    this.setState(() =>({
-      inputValue : event.target.value
+    this.setState(() => ({
+      inputValue: event.target.value
     }));
-  }
+  };
 
-  onClickBtn = () => {
-    const { inputValue, toDoList } = this.state;
+  addTask = () => {
+    const { inputValue, tasks } = this.state;
+
+    let newTask = {id: v1(), title: inputValue, isDone: false};
+    let newTasks = [newTask, ...tasks];
 
     this.setState({
-      toDoList: [inputValue, ...toDoList],
-      inputValue: ''
+      tasks: newTasks,
+      inputValue: "",
+    });
+  };
+
+  addTaskEnter = (event) => {
+    const { inputValue, tasks } = this.state;
+    
+    if (event.charCode === 13) {
+      let newTask = { id: v1(), title: inputValue, isDone: false };
+      let newTasks = [newTask, ...tasks];
+
+      this.setState({
+        tasks: newTasks,
+        inputValue: "",
+      });
+    }
+  }
+
+  removeTask = (id) => {
+    const { tasks } = this.state;
+    const filteredToDoList = tasks.filter((item) => item.id !== id);
+    this.setState({
+      tasks: filteredToDoList,
+    });
+  };
+
+  changeFilter = (value) => {
+    this.setState({
+      filter: value
     })
   }
 
-  onRemoveToDo = (todoName) => {
-    const {toDoList} = this.state;
-
-    const todoIndex = toDoList.findIndex((item) => item === todoName)
-
-    this.setState({
-      toDoList: [...toDoList.slice(0, todoIndex), ...toDoList.slice(todoIndex+1)]
-    });
-  }
-
   render() {
-    const { inputValue, toDoList } = this.state;
+    const { inputValue, tasks, filter } = this.state;
+    
+    let tasksForTodolist = tasks;
 
+    if (filter === "completed") {
+      tasksForTodolist = tasks.filter((item) => item.isDone === true);
+    }
+    if (filter === "active") { 
+      tasksForTodolist = tasks.filter((item) => item.isDone === false);
+    }
+    
     return (
-      <div>
+      <div className="App">
         <Title name="To Do List" />
-
         <div className="control">
-          <Input value={inputValue} onChange={this.onChangeInput} />
-          <Button text="add TODO" onClick={this.onClickBtn} />
+          <Input
+            value={inputValue}
+            onChangeInput={this.onChangeInput}
+            addTaskEnter={this.addTaskEnter}
+          />
+          <Button text="add TODO" onClick={this.addTask} />
         </div>
-
-        <div className="list">
-          {toDoList.map((item) => {
-            return (
-              <ListItem key={item} todoName={item} remove={this.onRemoveToDo} />
-            );
-          })}
-        </div>
-
-        <RenderChild>
-          <div>Ekaterina</div>
-          <div>456</div>
-          <div>Kopylova</div>
-        </RenderChild>
+        <List tasks={tasksForTodolist} removeTask={this.removeTask} />
+        <Filters changeFilter={this.changeFilter} />
       </div>
     );
   }
-  
 }
 
 export default App;
