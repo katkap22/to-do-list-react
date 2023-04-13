@@ -12,3 +12,7 @@
     background-color:blueviolet;
     color: white;
 }
+
+.active-filter {
+    background-color: red;
+}

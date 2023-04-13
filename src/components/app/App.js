@@ -14,6 +14,8 @@ class App extends React.Component {
       inputValue: "",
       tasks: [], //массив объектов (id, title, isDone)
       filter: "all",
+      onChange: false,
+      error: null
     };
   }
 
@@ -26,19 +28,7 @@ class App extends React.Component {
   addTask = () => {
     const { inputValue, tasks } = this.state;
 
-    let newTask = {id: v1(), title: inputValue, isDone: false};
-    let newTasks = [newTask, ...tasks];
-
-    this.setState({
-      tasks: newTasks,
-      inputValue: "",
-    });
-  };
-
-  addTaskEnter = (event) => {
-    const { inputValue, tasks } = this.state;
-    
-    if (event.charCode === 13) {
+    if(inputValue.trim() !== '') {
       let newTask = { id: v1(), title: inputValue, isDone: false };
       let newTasks = [newTask, ...tasks];
 
@@ -46,6 +36,32 @@ class App extends React.Component {
         tasks: newTasks,
         inputValue: "",
       });
+    } else {
+        this.setState({
+          error: "Title is required",
+        });
+    }
+  };
+
+  addTaskEnter = (event) => {
+    const { inputValue, tasks } = this.state;
+    this.setState({
+      error: null,
+    });
+    if (event.charCode === 13) {
+      if (inputValue.trim() !== '') {
+        let newTask = { id: v1(), title: inputValue, isDone: false };
+        let newTasks = [newTask, ...tasks];
+
+        this.setState({
+          tasks: newTasks,
+          inputValue: "",
+        }); 
+      } else {
+        this.setState({
+          error: "Title is required"
+        })
+      }
     }
   }
 
@@ -63,8 +79,19 @@ class App extends React.Component {
     })
   }
 
+  changeStatus = (taskId, isDone) => {
+    const { tasks } = this.state;
+    let task = tasks.find(t => t.id === taskId); 
+    if(task) {
+      task.isDone = isDone;
+    } 
+    this.setState({
+      tasks: [...tasks]
+    });
+    }
+
   render() {
-    const { inputValue, tasks, filter } = this.state;
+    const { inputValue, tasks, filter, error } = this.state;
     
     let tasksForTodolist = tasks;
 
@@ -81,13 +108,20 @@ class App extends React.Component {
         <div className="control">
           <Input
             value={inputValue}
+            error={error}
             onChangeInput={this.onChangeInput}
             addTaskEnter={this.addTaskEnter}
           />
           <Button text="add TODO" onClick={this.addTask} />
         </div>
-        <List tasks={tasksForTodolist} removeTask={this.removeTask} />
-        <Filters changeFilter={this.changeFilter} />
+        {error && <div className="error-message">{error}</div>}
+        <List
+          tasks={tasksForTodolist}
+          removeTask={this.removeTask}
+          changeStatus={this.changeStatus}
+        />
+        <Filters changeFilter={this.changeFilter}
+                 filter={filter} />
       </div>
     );
   }
