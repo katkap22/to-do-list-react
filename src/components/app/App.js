@@ -112,7 +112,7 @@ class App extends React.Component {
             onChangeInput={this.onChangeInput}
             addTaskEnter={this.addTaskEnter}
           />
-          <Button text="add TODO" onClick={this.addTask} />
+          <Button text="add TODO" onClickHandler={this.addTask} />
         </div>
         {error && <div className="error-message">{error}</div>}
         <List

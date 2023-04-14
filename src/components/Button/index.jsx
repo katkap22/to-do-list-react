@@ -1,11 +1,11 @@
 import React from "react";
 import './index.css';
 
-function Button({ text, onClick, customClass, activeFilterClass }) {
+function Button({ text, customClass, onClickHandler }) {
   return (
       <button
-        className={`btn ${customClass ? customClass : ""} || ${activeFilterClass ? activeFilterClass : ''}`}
-        onClick={onClick}
+        className={`btn ${customClass ? customClass : ""}`}
+        onClick={onClickHandler}
       >
         {text}
       </button>

@@ -3,24 +3,22 @@ import "./index.css";
 import Button from "../Button";
 
 function Filters({ changeFilter, filter}) {
+  
   return (
     <>
       <Button
-        activeFilterClass={filter === 'all' ? "active-filter" : ''}
-        customClass="btn_filter"
-        onClick={() => changeFilter("all")}
+        customClass={`btn_filter ${filter === "all" ? "active-filter" : ""}`}
+        onClickHandler={() => changeFilter("all")}
         text="All"
       />
       <Button
-        activeFilterClass={filter === 'active' ? "active-filter" : ''}
-        customClass="btn_filter"
-        onClick={() => changeFilter("active")}
+        customClass={`btn_filter ${filter === "active" ? "active-filter" : ""}`}
+        onClickHandler={() => changeFilter("active")}
         text="Active"
       />
       <Button
-        activeFilterClass={filter === 'completed' ? "active-filter" : ''}
-        customClass="btn_filter"
-        onClick={() => changeFilter("completed")}
+        customClass={`btn_filter ${filter === "completed" ? "active-filter" : ""}`}
+        onClickHandler={() => changeFilter("completed")}
         text="Completed"
       />
     </>

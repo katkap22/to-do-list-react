@@ -21,7 +21,7 @@ function List({ tasks, removeTask, changeStatus }) {
               <span className="item_text">{item.title}</span>
               <Button
                 text="x"
-                onClick={onRemoveTask}
+                onClickHandler={onRemoveTask}
                 customClass="item_btn" />
             </li>
           );
