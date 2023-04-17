@@ -15,6 +15,9 @@ class App extends React.Component {
       tasks: [], //массив объектов (id, title, isDone)
       filter: "all",
       onChange: false,
+      statusTask: "",
+      counter: 0,
+      counterMessage: "",
       error: null
     };
   }
@@ -35,6 +38,7 @@ class App extends React.Component {
       this.setState({
         tasks: newTasks,
         inputValue: "",
+        statusTask: `Вы добавили задачу: ${newTask.title}. ${new Date()}`,
       });
     } else {
         this.setState({
@@ -54,6 +58,7 @@ class App extends React.Component {
         let newTasks = [newTask, ...tasks];
 
         this.setState({
+          statusTask: `Вы добавили задачу: ${newTask.title}. ${new Date()}`,
           tasks: newTasks,
           inputValue: "",
         }); 
@@ -67,10 +72,21 @@ class App extends React.Component {
 
   removeTask = (id) => {
     const { tasks } = this.state;
+    // let countCompletedTasks = counter;
+
+    const removeTask = tasks.filter(item => item.id === id);
+    
     const filteredToDoList = tasks.filter((item) => item.id !== id);
     this.setState({
+      statusTask: `Вы удалили задачу: ${removeTask[0].title}. ${new Date()}`,
       tasks: filteredToDoList,
     });
+    // if (removeTask[0].isDone === true) {
+    //   this.setState({
+    //     counter: countCompletedTasks - 1
+    //   })
+    // }
+    
   };
 
   changeFilter = (value) => {
@@ -81,18 +97,54 @@ class App extends React.Component {
 
   changeStatus = (taskId, isDone) => {
     const { tasks } = this.state;
+    // let countCompletedTasks = counter;
     let task = tasks.find(t => t.id === taskId); 
+    
     if(task) {
       task.isDone = isDone;
+      if (isDone === true) {
+        
+        this.setState({
+          tasks: [...tasks],
+          // counter: countCompletedTasks + 1,
+          statusTask: `Вы завершили задачу: ${task.title}. ${new Date()}`,
+        });
+
+      } else {
+
+        this.setState({
+          tasks: [...tasks],
+          // counter: countCompletedTasks - 1,
+          statusTask: `Вы отменили завершение задачи: ${task.title}. ${new Date()}`,
+        });
+      }
     } 
+  }
+
+  counterCompletedTask = () => {
+    const { tasks } = this.state;
+
+    let count = 0;
+
+    tasks.map(task => {
+      if (task.isDone === true) {
+        count = ++count;
+      }
+      return count;
+    })
     this.setState({
-      tasks: [...tasks]
+      counter: count,
     });
-    }
+    this.setState({
+      counterMessage: `Количество выполненных задач из списка: ${count}`
+    })
+
+    setTimeout(() => this.setState({counterMessage: ""}), 5000);
+    
+  }
 
   render() {
-    const { inputValue, tasks, filter, error } = this.state;
-    
+    const { inputValue, tasks, filter, error, statusTask, counterMessage } = this.state;
     let tasksForTodolist = tasks;
 
     if (filter === "completed") {
@@ -115,13 +167,19 @@ class App extends React.Component {
           <Button text="add TODO" onClickHandler={this.addTask} />
         </div>
         {error && <div className="error-message">{error}</div>}
+        {statusTask && <div>{statusTask}</div>}
+        <Button
+          text="Показать количество выполненных задач"
+          onClickHandler={this.counterCompletedTask}
+          customClass="counter_btn"
+        ></Button>
+        <span>{counterMessage}</span>
         <List
           tasks={tasksForTodolist}
           removeTask={this.removeTask}
           changeStatus={this.changeStatus}
         />
-        <Filters changeFilter={this.changeFilter}
-                 filter={filter} />
+        <Filters changeFilter={this.changeFilter} filter={filter} />
       </div>
     );
   }

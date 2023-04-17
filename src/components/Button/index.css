@@ -16,3 +16,8 @@
 .active-filter {
     background-color: red;
 }
+
+.counter_btn {
+    width: 400px;
+    margin: 10px 5px 0 5px;
+}
