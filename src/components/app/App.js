@@ -5,184 +5,188 @@ import Input from '../Input';
 import Button from '../Button';
 import List from '../List';
 import Filters from '../Filters';
-import { v1 } from 'uuid';
+import {v1} from 'uuid';
 
 class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      inputValue: "",
-      tasks: [], //массив объектов (id, title, isDone)
-      filter: "all",
-      onChange: false,
-      statusTask: "",
-      counter: 0,
-      counterMessage: "",
-      error: null
+    constructor(props) {
+        super(props);
+        this.state = {
+            inputValue: "",
+            tasks: [], //массив объектов (id, title, isDone)
+            filter: "all",
+            onChange: false,
+            statusTask: "",
+            counter: 0,
+            counterMessage: "",
+            error: null
+        };
+    }
+
+    onChangeInput = (event) => {
+        this.setState(() => ({
+            inputValue: event.target.value
+        }));
     };
-  }
 
-  onChangeInput = (event) => {
-    this.setState(() => ({
-      inputValue: event.target.value
-    }));
-  };
+    addTask = () => {
+        const {inputValue, tasks} = this.state;
 
-  addTask = () => {
-    const { inputValue, tasks } = this.state;
+        if (inputValue.trim() !== '') {
+            let newTask = {id: v1(), title: inputValue, isDone: false};
+            let newTasks = [newTask, ...tasks];
 
-    if(inputValue.trim() !== '') {
-      let newTask = { id: v1(), title: inputValue, isDone: false };
-      let newTasks = [newTask, ...tasks];
+            this.setState({
+                tasks: newTasks,
+                inputValue: "",
+                statusTask: `Вы добавили задачу: ${newTask.title}. ${new Date()}`,
+            });
+        } else {
+            this.setState({
+                error: "Title is required",
+            });
+        }
+    };
 
-      this.setState({
-        tasks: newTasks,
-        inputValue: "",
-        statusTask: `Вы добавили задачу: ${newTask.title}. ${new Date()}`,
-      });
-    } else {
+    addTaskEnter = (event) => {
+        const {inputValue, tasks} = this.state;
         this.setState({
-          error: "Title is required",
+            error: null,
         });
+
+        if (event.charCode === 13) {
+            if (inputValue.trim() !== '') {
+                let newTask = {id: v1(), title: inputValue, isDone: false};
+                let newTasks = [newTask, ...tasks];
+
+                this.setState({
+                    statusTask: `Вы добавили задачу: ${newTask.title}. ${new Date()}`,
+                    tasks: newTasks,
+                    inputValue: "",
+                });
+            } else {
+                this.setState({
+                    error: "Title is required"
+                })
+            }
+        }
     }
-  };
 
-  addTaskEnter = (event) => {
-    const { inputValue, tasks } = this.state;
-    this.setState({
-      error: null,
-    });
-    if (event.charCode === 13) {
-      if (inputValue.trim() !== '') {
-        let newTask = { id: v1(), title: inputValue, isDone: false };
-        let newTasks = [newTask, ...tasks];
+    removeTask = (id) => {
+        const {tasks} = this.state;
 
+        const removeTask = tasks.filter(item => item.id === id);
+
+        const filteredToDoList = tasks.filter(item => item.id !== id);
         this.setState({
-          statusTask: `Вы добавили задачу: ${newTask.title}. ${new Date()}`,
-          tasks: newTasks,
-          inputValue: "",
-        }); 
-      } else {
+            statusTask: `Вы удалили задачу: ${removeTask[0].title}. ${new Date()}`,
+            tasks: filteredToDoList,
+        });
+    };
+
+    changeFilter = (value) => {
         this.setState({
-          error: "Title is required"
+            filter: value
         })
-      }
     }
-  }
 
-  removeTask = (id) => {
-    const { tasks } = this.state;
-    // let countCompletedTasks = counter;
+    changeStatus = (taskId, isDone) => {
+        const {tasks} = this.state;
+        let task = tasks.find(t => t.id === taskId);
 
-    const removeTask = tasks.filter(item => item.id === id);
-    
-    const filteredToDoList = tasks.filter((item) => item.id !== id);
-    this.setState({
-      statusTask: `Вы удалили задачу: ${removeTask[0].title}. ${new Date()}`,
-      tasks: filteredToDoList,
-    });
-    // if (removeTask[0].isDone === true) {
-    //   this.setState({
-    //     counter: countCompletedTasks - 1
-    //   })
-    // }
-    
-  };
+        if (task) {
+            task.isDone = isDone;
+            if (isDone === true) {
 
-  changeFilter = (value) => {
-    this.setState({
-      filter: value
-    })
-  }
+                this.setState({
+                    tasks: [...tasks],
+                    // counter: countCompletedTasks + 1,
+                    statusTask: `Вы завершили задачу: ${task.title}. ${new Date()}`,
+                });
 
-  changeStatus = (taskId, isDone) => {
-    const { tasks } = this.state;
-    // let countCompletedTasks = counter;
-    let task = tasks.find(t => t.id === taskId); 
-    
-    if(task) {
-      task.isDone = isDone;
-      if (isDone === true) {
-        
+            } else {
+
+                this.setState({
+                    tasks: [...tasks],
+                    // counter: countCompletedTasks - 1,
+                    statusTask: `Вы отменили завершение задачи: ${task.title}. ${new Date()}`,
+                });
+            }
+        }
+    }
+
+    counterCompletedTask = () => {
+        const {tasks} = this.state;
+
+        let count = 0;
+
+        tasks.map(task => {
+            if (task.isDone === true) {
+                count = ++count;
+            }
+            return count;
+        })
         this.setState({
-          tasks: [...tasks],
-          // counter: countCompletedTasks + 1,
-          statusTask: `Вы завершили задачу: ${task.title}. ${new Date()}`,
+            counter: count,
         });
-
-      } else {
-
         this.setState({
-          tasks: [...tasks],
-          // counter: countCompletedTasks - 1,
-          statusTask: `Вы отменили завершение задачи: ${task.title}. ${new Date()}`,
-        });
-      }
-    } 
-  }
+            counterMessage: `Количество выполненных задач из списка: ${count}`
+        })
 
-  counterCompletedTask = () => {
-    const { tasks } = this.state;
+        setTimeout(() => this.setState({counterMessage: ""}), 5000);
 
-    let count = 0;
-
-    tasks.map(task => {
-      if (task.isDone === true) {
-        count = ++count;
-      }
-      return count;
-    })
-    this.setState({
-      counter: count,
-    });
-    this.setState({
-      counterMessage: `Количество выполненных задач из списка: ${count}`
-    })
-
-    setTimeout(() => this.setState({counterMessage: ""}), 5000);
-    
-  }
-
-  render() {
-    const { inputValue, tasks, filter, error, statusTask, counterMessage } = this.state;
-    let tasksForTodolist = tasks;
-
-    if (filter === "completed") {
-      tasksForTodolist = tasks.filter((item) => item.isDone === true);
     }
-    if (filter === "active") { 
-      tasksForTodolist = tasks.filter((item) => item.isDone === false);
+
+    componentDidMount() {
+        const tasks = JSON.parse(window.localStorage.getItem('tasks')) || [];
+        const counter = localStorage.getItem('counter');
+        const counterMessage = localStorage.getItem('counterMessage');
+        this.setState({tasks, counter, counterMessage});
     }
-    
-    return (
-      <div className="App">
-        <Title name="To Do List" />
-        <div className="control">
-          <Input
-            value={inputValue}
-            error={error}
-            onChangeInput={this.onChangeInput}
-            addTaskEnter={this.addTaskEnter}
-          />
-          <Button text="add TODO" onClickHandler={this.addTask} />
-        </div>
-        {error && <div className="error-message">{error}</div>}
-        {statusTask && <div>{statusTask}</div>}
-        <Button
-          text="Показать количество выполненных задач"
-          onClickHandler={this.counterCompletedTask}
-          customClass="counter_btn"
-        ></Button>
-        <span>{counterMessage}</span>
-        <List
-          tasks={tasksForTodolist}
-          removeTask={this.removeTask}
-          changeStatus={this.changeStatus}
-        />
-        <Filters changeFilter={this.changeFilter} filter={filter} />
-      </div>
-    );
-  }
+
+    componentDidUpdate() {
+        window.localStorage.setItem('tasks', JSON.stringify(this.state.tasks));
+    }
+
+    render() {
+        const {inputValue, tasks, filter, error, statusTask, counterMessage} = this.state;
+        let tasksForTodolist = tasks;
+
+        if (filter === "completed") {
+            tasksForTodolist = tasks.filter((item) => item.isDone);
+        }
+        if (filter === "active") {
+            tasksForTodolist = tasks.filter((item) => !item.isDone);
+        }
+
+        return (
+            <div className="App">
+                <Title name="To Do List"/>
+                <div className="control">
+                    <Input
+                        value={inputValue}
+                        error={error}
+                        onChangeInput={this.onChangeInput}
+                        addTaskEnter={this.addTaskEnter}
+                    />
+                    <Button text="add TODO" onClickHandler={this.addTask}/>
+                </div>
+                {error && <div className="error-message">{error}</div>}
+                {statusTask && <div>{statusTask}</div>}
+                <Button
+                    text="Показать количество выполненных задач"
+                    onClickHandler={this.counterCompletedTask}
+                    customClass="counter_btn"
+                ></Button>
+                <span>{counterMessage}</span>
+                <List
+                    tasks={tasksForTodolist}
+                    removeTask={this.removeTask}
+                    changeStatus={this.changeStatus}
+                />
+                <Filters changeFilter={this.changeFilter} filter={filter}/>
+            </div>
+        );
+    }
 }
 
 export default App;
